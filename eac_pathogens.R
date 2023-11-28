@@ -2,8 +2,9 @@ library(dplyr)
 library(stringr)
 library(ggplot2)
 library(cowplot)
+library(forcats)
 
-## extract relevant column
+## process Biosample data : extract relevant column
 
 acinetobacter_eac<- acinetobacter_eac_BioSample %>% 
    select(BioSampleAccession, BioSampleBioProjectAccession,
@@ -34,7 +35,7 @@ biosample.list <- list(acinetobacter_eac_BioSample, enterococcus_eac_BioSample,
 # Extract relevant columns and merge all tables
 merged_pathognes_eac.df <- bind_rows(lapply(biosample.list, extract_columns))
 
-# Define the selection criteria
+# Define counbtries list
 eac_partnerStates<- c("Burundi", "Kenya", "Tanzania",
                         "Uganda", "Democratic Republic of Congo", "Congo",
                         "DR Congo", "South Sudan","Rwanda")
@@ -58,8 +59,6 @@ bacterial_genomes_eac.df <- BVBRC_Bacteria_Africa %>%
        filter(!is.na(Year)) %>% filter(Year>=2008)
 
 
-bacterial_genomes_eac.df %>% filter(str_detect(Genus, "Acinetobacter"))
-
 
 bacterial_genomes_eac.df <- bacterial_genomes_eac.df %>%
   mutate(Pathogens = if_else(
@@ -78,38 +77,8 @@ asm.data <- bacterial_genomes_eac.df %>%
   filter(Year>=2008)
 
 
-
-
-
-
-
-
-# Convert Year column to numeric
-asm.data$Year <- as.numeric(asm.data$Year)
-
-# Line plot with marker dot and filled bars
-eac.asm.plot<-ggplot() +
-  geom_line(data = asm.data, aes(x = Year, y = AssemblyCount), color = "#009ADE") +
-  geom_point(data = asm.data, aes(x = Year, y = AssemblyCount), color = "#009ADE", size = 3) +
-  geom_area(data = asm.data, aes(x = Year, y = AssemblyCount), fill = "lightblue", alpha = 0.3) +
-  labs(x = "",
-       y = "Assemblies Count", 
-       title = "Bacterial assemblies in the EAC") +
-  theme_minimal() + scale_x_continuous(breaks = c(2008, 2012,2016,2019,2022))+
-  theme(
-    plot.title = element_text(face = "bold", size = 24, hjust = 0.5),
-    axis.title.x = element_text(size = 24),
-    axis.title.y = element_text(size = 24, face = "bold", color = "black"),
-    axis.text = element_text(size = 24, face = "bold", colour = "black"),
-  )+ geom_text(data = asm.data, 
-               aes(x = Year, y = AssemblyCount, label = AssemblyCount),
-               vjust = -1, size = 4, color = "black", fontface="bold")
-
-
-ggsave("assemblies_evaoltion_eac2.pdf",
-       width = 8.5, height = 6.5, dpi = 6000)
-
-
+## Process BVBRC data 
+#======================
 
 #### Data from all Africa
 all.pathognes <- BVBRC_genome %>%
@@ -152,8 +121,6 @@ assembly_sum <- all.pathognes %>%
   summarize(Cumulative_Assembly_Count = n()) %>%
   group_by(Region) %>%
   mutate(Cumulative_Assembly_Count = cumsum(Cumulative_Assembly_Count))
-
-
 
 
 
@@ -257,9 +224,6 @@ ggplot(df, aes(x = "", y = values, fill = labels)) +
 
 
 
-library(ggplot2)
-library(dplyr)
-
 # Data
 color_palette2 <- c("#CDE5D2", "#9CCEA7", "red", "#40AD5A", "blue", "#06592A")
 labels2 <- c("Burundi", "DR Congo", "Kenya", "Rwanda", "Tanzania", "Uganda")
@@ -299,8 +263,6 @@ ggplot(df2, aes(x = 1, y = percent, fill = labels2)) +
 
 
 
-library(ggplot2)
-library(dplyr)
 
 # Data
 color_palette2 <- c("#CDE5D2", "#9CCEA7", "red", "#40AD5A", "blue", "#06592A")
@@ -317,23 +279,6 @@ df2$percent <- df2$values2 / sum(df2$values2) * 100
 
 # Calculate the cumulative percentage
 df2$cum_percent <- cumsum(df2$percent) - 0.5 * df2$percent
-
-# Create the donut plot
-ggplot(df2, aes(x = 1, y = percent, fill = labels2)) +
-  geom_bar(stat = "identity", width = 1, color = "white") +
-  coord_polar(theta = "y") +
-  scale_fill_manual(values = color_palette2) +
-  theme_void() +
-  theme(legend.position = "none",
-        plot.title = element_text(size = 24, hjust = 0.5, vjust = 1),
-        text = element_text(size = 24)) +
-  geom_text(aes(y = cum_percent, label = paste0("(", values2, ")")), color = "black", size = 5) +
-  xlim(0.5, 1.5) +
-  ylim(0, 100) +
-  labs(title = "Samples Isolated in East African Countries") +
-  theme(plot.margin = margin(1, 1, 1, 1, "cm"),
-        plot.background = element_rect(fill = "white"))
-
 
 
 
@@ -484,29 +429,6 @@ plot +
 
 
 
-library(ggplot2)
-library(patchwork)
-
-assembly_sum$Year <- as.numeric(assembly_sum$Year)  # Convert Year to numeric
-
-
-
-ggplot(assembly_sum, aes(x = Year,
-                         y = Cumulative_Assembly_Count, color = Region)) +
-  geom_line() +
-  geom_point() +
-  labs(x = "Year", y = "Cumulative Assembly Count", color = "Region") +
-  scale_x_continuous(breaks = seq(2008, 2022, 2)) +
-  scale_y_log10() +  # Add log scale for the y-axis
-  scale_color_manual(values = custom_colors) +  # Set the custom color palette
-  theme_minimal()
-
-
-
-
-
-library(ggplot2)
-library(scales)
 
 assembly_sum$Year <- as.numeric(assembly_sum$Year)  # Convert Year to numeric
 
@@ -528,37 +450,6 @@ ggplot(assembly_sum, aes(x = Year,
   scale_y_log10(labels = custom_labels) +  # Add log scale with custom labels
   scale_color_manual(values = custom_colors) +  # Set the custom color palette
   theme_minimal()
-
-
-
-
-
-
-library(ggplot2)
-
-# Convert Year column to numeric
-asm.data$Year <- as.numeric(asm.data$Year)
-
-# Line plot with marker dot
-line_plot <- ggplot(asm.data, aes(x = Year, y = AssemblyCount)) +
-  geom_line(color = "blue") +
-  geom_point(color = "blue", size = 3) +
-  labs(x = "Year", y = "Assembly Count", title = "Evolution of Assembly Count") +
-  theme_minimal()
-
-# Density plot
-density_plot <- ggplot(asm.data, aes(x = AssemblyCount)) +
-  geom_density(alpha = 0.2, fill = "gray", color = "black") +
-  labs(x = "Assembly Count", y = "Density", title = "Distribution of Assembly Count") +
-  theme_minimal()
-
-# Combine the plots
-combined_plot <- plot_grid(line_plot, density_plot, ncol = 1, align = "v")
-
-# Display the combined plot
-print(combined_plot)
-
-
 
 
 
@@ -597,18 +488,6 @@ legend("topright", legend = "Assembly Count", col = "blue", lty = 1, pch = 16)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ### Barplots
 
 # Create the dataframe
@@ -640,8 +519,7 @@ color_palette <- c("#999999", "#E69F00")  # Colors for GLASS and Non-GLASS
 
 
 
-library(ggplot2)
-library(dplyr)
+
 
 # Create the dataframe
 data <- data.frame(
@@ -916,19 +794,11 @@ df<-eac.table
            axis.text.x = element_text(angle = 45, hjust = 1),
            plot.title = element_text(size = 16, hjust = 0.5, vjust = 1),
            text = element_text(size = 12))
-   
-   
-   
-   
-   
-   
-   
-   
+
    
    
    
    # Load the required libraries
-   library(ggplot2)
    
    # Your data (assuming the tibble is named "data")
    # Replace "data" with the actual name of your tibble if it's different
@@ -949,12 +819,6 @@ df<-eac.table
            text = element_text(size = 12))
    
    
-   
-   # Load the required libraries
-   library(ggplot2)
-   
-   # Your data (assuming the tibble is named "data")
-   # Replace "data" with the actual name of your tibble if it's different
    
    # Create the stacked bar plot
    ggplot(df, aes(x = Isolation.Country, y = assembliesCount, fill = Period)) +
@@ -1101,42 +965,9 @@ df<-eac.table
   
    
    
-   # Load the required libraries
-   library(ggplot2)
-   library(dplyr)
-   
-   # Your data (assuming the tibble is named "df")
-   # Replace "df" with the actual name of your tibble if it's different
-   
-   # Reorder the levels of Isolation.Country based on the number of GLASS pathogens
-   df <- df %>%
-     mutate(Isolation.Country = factor(Isolation.Country, levels = df %>%
-                                         group_by(Isolation.Country) %>%
-                                         filter(Pathogens == "GLASS") %>%
-                                         summarize(count = sum(assembliesCount)) %>%
-                                         arrange(count) %>%
-                                         pull(Isolation.Country)))
-   
-   # Create the stacked bar chart
-   ggplot(df %>% filter(Isolation.Country !="Congo"), 
-          aes(x = Period, y = assembliesCount, fill = Pathogens)) +
-     geom_bar(stat = "identity") +
-     facet_wrap(~ Isolation.Country, ncol = 3) +
-     labs(title = "",
-          x = "Period",
-          y = "Assemblies Count",
-          fill = "Pathogens Type") +
-     theme_minimal() +
-     theme(axis.text.x = element_text(angle = 45, hjust = 1),
-           strip.text = element_text(size = 12),
-           plot.title = element_text(size = 16, hjust = 0.5, vjust = 1),
-           legend.title = element_blank(),
-           text = element_text(size = 12))
    
    
-   
-   
-   library(forcats)
+
    
    # Manually set the order of countries
    country_order <- c("Burundi", "Democratic Republic of the Congo", 
@@ -1198,66 +1029,16 @@ df<-eac.table
            text = element_text(size = 30, color = "black", face = "bold"))
    
    
-  
    
    
    ggsave("Glass_EAC.pdf", width = 10, height = 10, dpi = 6000)
    
    
-   # Load the required libraries
-   library(ggplot2)
-   library(dplyr)
    
-   # Your data (assuming the tibble is named "df")
-   # Replace "df" with the actual name of your tibble if it's different
-   
-   # Define the order of countries based on the number of GLASS pathogens
-   country_order <- df %>%
-     filter(Pathogens == "GLASS") %>%
-     group_by(Isolation.Country) %>%
-     summarize(count = sum(assembliesCount)) %>%
-     arrange(count) %>%
-     pull(Isolation.Country)
-   
-   # Reorder the levels of Isolation.Country based on the predefined order
-   df <- df %>%
-     mutate(Isolation.Country = factor(Isolation.Country, levels = country_order))
-   
-   # Create the stacked bar chart
-   ggplot(df, aes(x = Period, y = assembliesCount, fill = Pathogens)) +
-     geom_bar(stat = "identity") +
-     facet_wrap(~ Isolation.Country, ncol = 3) +
-     labs(title = "Number of Assemblies per Country and Period (Stacked by Pathogens Type)",
-          x = "Period",
-          y = "Assemblies Count",
-          fill = "Pathogens Type") +
-     theme_minimal() +
-     theme(axis.text.x = element_text(angle = 45, hjust = 1),
-           strip.text = element_text(size = 12),
-           plot.title = element_text(size = 16, hjust = 0.5, vjust = 1),
-           legend.position = c(0.8, 0.5),  # Adjust the legend position here (x, y)
-           legend.justification = c(1, 0.5),  # Adjust the legend justification here (right, center)
-           legend.title = element_blank(),
-           text = element_text(size = 12))
-   
-   
-   
-   ### Worlmap
-   world.eac <- bacterial_genomes_eac.df %>%
-     filter(Genome.Status %in% c("WGS", "Complete")) %>%
-     select(Completion.Date,Species, Sequencing.Center, 
-            Sequencing.Platform,
-            Pathogens,Isolation.Country, Genome.Status, ) %>%
-           filter(Sequencing.Center != "") %>%
-     mutate(Year = format(as.Date(strptime(Completion.Date, 
-                                           "%Y-%m-%dT%H:%M:%SZ")), "%Y")) %>%
-     filter(Year>2007) %>% filter(Isolation.Country != "Sudan") %>%
-     filter(Isolation.Country != "Congo")
-   
-   
+      
 
    
-   # Assuming your data is in a data frame named 'world.eac'
+   # Filter by sequencing platform
    world.eac$Technology <- case_when(
      is.na(world.eac$Sequencing.Platform) | world.eac$Sequencing.Platform == "" ~ "no.info",
      grepl("PacBio|Sequel", world.eac$Sequencing.Platform, ignore.case = TRUE) ~ "PacBio",
@@ -1280,9 +1061,7 @@ df<-eac.table
    write.csv(world.eac_summary_table, "world.eac_summary_table.txt",
              row.names = FALSE)
    
-   
-
-   
+      
 
    result.world.eac <- world_eac_summary_table %>%
      group_by(Owner.Country, ISO3, Pathogens) %>%
@@ -1295,8 +1074,7 @@ df<-eac.table
 
 
    
-   # Sample data (assuming it is read into a dataframe named 'df')
-   # If you have the data as a CSV or Excel file, you can read it into 'df' using read.csv() or read_excel() functions.
+
    
    # Group by Isolation.Country and Region, and summarize the data
    df_summary <-world_eac_summary_table %>%
@@ -1321,71 +1099,10 @@ df<-eac.table
            legend.title = element_blank(),
            legend.text = element_text(size = 30, color = "black", face = "bold"),
            plot.title = element_text(size = 30, hjust = 0.5, face = "bold"))
-   
-   
-   
-   
-   
-  world.eac<- eac.table %>% filter(Year>2007) %>%
-    group_by(Species, Year, Isolation.Country) %>%
-    summarise(assembliesCount = n(),
-              MaxN50 = max(Contig.N50)) %>%
-    ungroup() %>% filter(Species!="")
-  
-  
-mydate_contigs50 <-bacterial_genomes_eac.df %>% 
-  select(Completion.Date,Contig.N50, Species) %>%
-  filter (!is.na(Contig.N50))
-   
-merge(mydate_contigs50, world.eac, by=c("Species"))
 
 
 
 
-##### Plot N50 vs yaers
-
-
-
-# Assuming your data is in a data frame named "genome_data"
-# If not, you can read the data into R using read.csv() or any appropriate function.
-
-# Calculate the total number of genomes for each country
-total_genomes <- world_eac_summary_table %>%
-  group_by(Isolation.Country) %>%
-  summarize(Total_Genomes = sum(Number_of_Genomes))
-
-# Calculate the total number of genomes for each category in each country
-category_genomes <-world_eac_summary_table %>%
-  group_by(Isolation.Country, Region) %>%
-  summarize(Category_Genomes = sum(Number_of_Genomes))
-
-# Merge the data to get the final summary
-summary_data <- merge(total_genomes, category_genomes, 
-                      by = "Isolation.Country", all.x = TRUE)
-
-# Fill NA with 0 (countries with 0 genomes in a category)
-summary_data$Category_Genomes[is.na(summary_data$Category_Genomes)] <- 0
-
-# Calculate percentages for each category in each country
-summary_data$Percentage_EAC <- (summary_data$Category_Genomes[summary_data$Region == "EAC"] / summary_data$Total_Genomes) * 100
-summary_data$Percentage_Africa <- (summary_data$Category_Genomes[summary_data$Region == "Africa"] / summary_data$Total_Genomes) * 100
-summary_data$Percentage_Out_of_Africa <- (summary_data$Category_Genomes[summary_data$Region == "Out-of-Africa"] / summary_data$Total_Genomes) * 100
-
-# Display the final summary
-print(summary_data[, c("Country", "Percentage_EAC", "Percentage_Africa",
-                       "Percentage_Out_of_Africa")])
-
-
-
-
-
-
-
-# Load the required library
-library(dplyr)
-
-# Assuming your data is in a data frame named "genome_data"
-# If not, you can read the data into R using read.csv() or any appropriate function.
 
 # Calculate the total number of genomes for each country and region
 total_genomes <- world_eac_summary_table %>%
@@ -1414,17 +1131,6 @@ summary_data <- summary_data %>%
 print(summary_data)
 
 write.csv(summary_data, "summary_data_sequencing.txt", row.names = FALSE)
-
-
-
-
-
-
-
-
-
-
-
 
 
 
