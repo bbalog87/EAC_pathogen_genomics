@@ -301,16 +301,6 @@ ggplot(df2, aes(x = 1, y = percent, fill = labels2)) +
 
 
 
-
-
-
-
-
-
-
-library(ggplot2)
-library(dplyr)
-
 # Data
 labels2 <- c("Burundi", "DR Congo", "Kenya", "Rwanda", "Tanzania", "Uganda")
 values2 <- c(2, 54, 1443, 45, 2233, 858)
@@ -349,45 +339,6 @@ ggplot(df2, aes(x = 1, y = percent, fill = labels2)) +
 
 
 
-
-
-
-
-df2 <- data.frame(labels2, values2)
-df2$percent <- df2$values2 / sum(df2$values2) * 100
-
-df2 <- df2[order(-df2$values2), ]
-
-ggplot(df2, aes(x = "", y = values2, fill = labels2)) +
-  geom_bar(stat = "identity", color = "white", width = 1) +
-  coord_polar(theta = "y") +
-  scale_fill_manual(values = color_palette2) +
-  theme_void() +
-  theme(legend.position = "none",
-        plot.title = element_text(size = 24, hjust = 0.5, vjust = 1),
-        text = element_text(size = 24)) +
-  geom_segment(aes(x = 0, y = 0, xend = 1, yend = 0), linetype = "dotted", color = "gray") +
-  geom_polygon(data = data.frame(x = c(0.3, 0.3, 0.7, 0.7),
-                                 y = c(0.3, 0.7, 0.7, 0.3)),
-               aes(x, y), color = "black", fill = NA, size = 1) +
-  geom_text(aes(y = cumsum(values2) - 0.5 * values2, label = paste0("(", values2, ")")), size = 5) +
-  #geom_segment(data = df2,
-              # aes(x = 1.8, y = cumsum(values2) - 0.5 * values2, xend = 2.5, yend = cumsum(values2) - 0.5 * values2,
-                #   color = labels2), size = 1.2) +
-  geom_text(data = df2,
-            aes(x = 2.8, y = cumsum(values2) - 0.5 * values2, label = paste0(labels2, " (", values2, ")")),
-            hjust = 0, size = 6, color = "black") +
-  xlim(c(0, 3)) +
-  coord_equal(ratio = 1) +
-  labs(title = "Samples Isolated in East African Countries") +
-  theme(plot.margin = margin(1, 1, 1, 1, "cm"),
-        plot.background = element_rect(fill = "white"))
-
-
-
-
-
-llibrary(ggplot2)
 
 # Calculate total count
 total_count <- sum(df$values)
@@ -617,9 +568,7 @@ mutate(Year = format(as.Date(strptime(Completion.Date,
    
    
   
-   
-   # Your aggregated data
-   # Assuming it is stored in a variable called "result"
+
    
    # Convert Year to numeric for proper ordering on the x-axis
    eac.table.df$Year <- as.numeric(eac.table.df$Year)
@@ -678,12 +627,7 @@ df<-eac.table
    
    
    
-   
-   # Load the required library
-   library(ggplot2)
-   
-   # Assuming your data is in a dataframe called "df"
-   
+     
    # Create the jitter plot
    ggplot(df, aes(x = Period, y = log10(maxN50), color = Pathogens, shape = Pathogens)) +
      geom_jitter(position = position_jitter(width = 0.2, height = 0), alpha = 0.7, size = 4) +
@@ -895,13 +839,6 @@ df<-eac.table
    
    
    
-   
-   # Load the required libraries
-   library(ggplot2)
-   library(dplyr)
-   
-   # Your data (assuming the tibble is named "df")
-   # Replace "df" with the actual name of your tibble if it's different
    
    # Reorder the levels of Isolation.Country based on the number of GLASS pathogens
    df <- df %>%
