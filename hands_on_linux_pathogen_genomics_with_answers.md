@@ -90,6 +90,7 @@ seqkit sort -l -r fastas/16s_rRNA.fasta -o fastas/16s_rRNA.sorted.fasta
 
 </details>
 
+
 ---
 
 ## 2. 📦 FASTQ File Operations
