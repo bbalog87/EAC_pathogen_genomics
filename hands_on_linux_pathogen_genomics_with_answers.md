@@ -14,24 +14,13 @@ This lab guides you through handling common genomics data formats using Linux to
 
 ## 1. 📁 FASTA File Operations
 
-**Q1: Count how many sequences are in `Bacillus.fasta`.**
+**Q1: Extract only the FASTA headers (sequence names, no descriptions).**
 
 <details>
 <summary>Show Solution</summary>
 
 ```bash
-grep -c '^>' fastas/Bacillus.fasta
-```
-
-</details>
-
-**Q2: Preview the first 10 lines of the file.**
-
-<details>
-<summary>Show Solution</summary>
-
-```bash
-head -n 10 fastas/Bacillus.fasta
+grep '^>' fastas/16s_rRNA.fasta | cut -d' ' -f1 | cut -f2 -d ">" > headers.txt
 ```
 
 </details>
