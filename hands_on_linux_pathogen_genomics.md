@@ -1,5 +1,5 @@
 
-# 🧪 Hands-on Lab: Pathogen Genomic Data Manipulation with Linux Tools
+# Hands-on Lab: Pathogen Genomic Data Manipulation with Linux Tools
 
 This practical session guides trainees through handling and manipulating bioinformatics data formats using standard Unix/Linux tools and essential bioinformatics utilities (SeqKit, Samtools, BCFtools). It is based on real data folders provided under:
 
