@@ -25,6 +25,16 @@ grep '^>' fastas/16s_rRNA.fasta | cut -d' ' -f1 | cut -f2 -d ">" > headers.txt
 
 </details>
 
+
+**Q2: Create a tab-separated file of sequence name and its length.**
+
+<details>
+<summary>Show Solution</summary>
+
+```bash
+seqkit fx2tab -n -l fastas/16s_rRNA.fasta > seq_lengths.txt
+```
+
 **Q3: Print only sequence headers.**
 
 <details>
@@ -65,6 +75,17 @@ seqkit grep -p "16S" fastas/16s_rRNA.fasta -o fastas/filtered_16s.fasta
 
 ```bash
 seqkit subseq -r 1:100 fastas/Bacillus.fasta -o fastas/Bacillus.100bp.fasta
+```
+
+</details>
+
+**Q7: Sort the FASTA sequences from longest to shortest and save to a new file.**
+
+<details>
+<summary>Show Solution</summary>
+
+```bash
+seqkit sort -l -r fastas/16s_rRNA.fasta -o fastas/16s_rRNA.sorted.fasta
 ```
 
 </details>
