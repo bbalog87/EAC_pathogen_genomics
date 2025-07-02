@@ -1,5 +1,5 @@
 
-# 🧪 Hands-on Lab: Pathogen Genomic Data Manipulation with Linux Tools
+# Hands-on Lab: Pathogen Genomic Data Manipulation with Linux Tools
 
 This lab guides you through handling common genomics data formats using Linux tools: `grep`, `cut`, `sort`, `awk`, `wc`, `seqkit`, `samtools`, and `bcftools`. Use the dataset structured in:
 
